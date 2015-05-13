@@ -25,8 +25,13 @@ send_notifications = yes
     expect(subject.raw_lines.count).to eq(14)
   end
   it 'should read the lines without comments' do
-    puts subject.lines
     expect(subject.lines.count).to eq(9)
+  end
+  it 'should parse keys' do
+    expect(subject.keys).to eq(
+                              %w/host server_id server_load_alarm user
+verbose test_mode debug_mode log_file_path send_notifications/
+                            )
   end
 
   describe "comment rx" do
@@ -37,5 +42,11 @@ send_notifications = yes
       lines = [ 'data-line', '', 'data-line', '    ' ]
       expect(lines.grep(ConfigReader::RX_COMMENT)).to eq( [ '', '    ' ] )
     end
+  end
+  describe "parse line" do
+    it 'should split =' do
+      expect(subject.parse(["key=value"])).to eq({'key' => 'value'})
+    end
+
   end
 end
