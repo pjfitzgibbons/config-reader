@@ -3,24 +3,39 @@ require 'config_reader'
 
 describe ConfigReader do
   let(:sample) {
-    '# This is what a comment looks like, ignore it
-    # All these config lines are valid
-    host = test.com
-    server_id=55331
-    server_load_alarm=2.5
-    user= user
-    # comment can appear here as well
-    verbose =true
-    test_mode = on
-    debug_mode = off
-    log_file_path = /tmp/logfile.log
-    send_notifications = yes
+    '
+# This is what a comment looks like, ignore it
+# All these config lines are valid
+host = test.com
+server_id=55331
+server_load_alarm=2.5
+user= user
+# comment can appear here as well
+verbose =true
+test_mode = on
+debug_mode = off
+log_file_path = /tmp/logfile.log
+send_notifications = yes
     '
   }
 
-  subject {ConfigReader.new(sample)}
+  subject { ConfigReader.new(sample) }
 
   it 'should read the lines' do
-    expect(subject.lines.count).to eq(13)
+    expect(subject.raw_lines.count).to eq(14)
+  end
+  it 'should read the lines without comments' do
+    puts subject.lines
+    expect(subject.lines.count).to eq(9)
+  end
+
+  describe "comment rx" do
+    it 'should filter lines starting hash' do
+      expect(["# comment"].grep(ConfigReader::RX_COMMENT)).to eq(["# comment"])
+    end
+    it 'should filter empty lines' do
+      lines = [ 'data-line', '', 'data-line', '    ' ]
+      expect(lines.grep(ConfigReader::RX_COMMENT)).to eq( [ '', '    ' ] )
+    end
   end
 end
