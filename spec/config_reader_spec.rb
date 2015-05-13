@@ -16,22 +16,34 @@ test_mode = on
 debug_mode = off
 log_file_path = /tmp/logfile.log
 send_notifications = yes
+false_value=false
+yes_value=yes
+no_value=no
     '
   }
 
   subject { ConfigReader.new(sample) }
 
   it 'should read the lines' do
-    expect(subject.raw_lines.count).to eq(14)
+    expect(subject.raw_lines.count).to eq(17)
   end
   it 'should read the lines without comments' do
-    expect(subject.lines.count).to eq(9)
+    expect(subject.lines.count).to eq(12)
   end
   it 'should parse keys' do
     expect(subject.keys).to eq(
                               %w/host server_id server_load_alarm user
-verbose test_mode debug_mode log_file_path send_notifications/
+verbose test_mode debug_mode log_file_path send_notifications false_value
+yes_value no_value/
                             )
+  end
+  it 'should parse values into bool' do
+    expect(subject['verbose']).to eq true
+    expect(subject['test_mode']).to eq true
+    expect(subject['debug_mode']).to eq false
+    expect(subject['false_value']).to eq false
+    expect(subject['yes_value']).to eq true
+    expect(subject['no_value']).to eq false
   end
 
   describe "comment rx" do

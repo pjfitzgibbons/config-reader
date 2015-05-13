@@ -1,7 +1,7 @@
 
 class ConfigReader
 
-    attr_reader :lines, :raw_lines, :config
+    attr_reader :lines, :raw_lines
 
     RX_COMMENT = /^#|^\s*$/
 
@@ -11,17 +11,33 @@ class ConfigReader
       @config = parse(@lines)
     end
 
+    def [](key)
+      @config[key]
+    end
+
+    def keys
+      @config.keys
+    end
+
     def parse(lines)
       split_lines = lines.map {|l| split_key_value(l) }
       Hash[*split_lines.flatten]
     end
     def split_key_value(line)
       k,v = line.split("=")
-      [k.strip, v.strip]
+      [k.strip, value_parse(v.strip)]
     end
-    def keys
-      @config.keys
+    def value_parse(v)
+      case v
+        when /true|yes|on/
+          true
+        when /false|no|off/
+          false
+        else
+          v
+      end
     end
+
 
 
 end
