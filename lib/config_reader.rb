@@ -1,7 +1,7 @@
 
 class ConfigReader
 
-    attr_reader :lines, :raw_lines
+    attr_reader :lines, :raw_lines, :config
 
     RX_COMMENT = /^#|^\s*$/
 
@@ -33,6 +33,10 @@ class ConfigReader
           true
         when /false|no|off/
           false
+        when /^[-0-9]*$/
+          v.to_i
+        when /[-0-9]+\.[0-9]+$/
+          v.to_f
         else
           v
       end
